@@ -3,6 +3,7 @@ from config import TOKEN, HOST_DATABASE_HOST, HOST_DATABASE_USERNAME, HOST_DATAB
 import mysql.connector
 from response import response
 from core import dataBaseRequest
+from buttons import * 
 
 
 
@@ -23,24 +24,28 @@ def send_welcome(message):
     if len(dataBaseRequest(f"SELECT * FROM `users` WHERE `chatID` = '{message.chat.id}'")) == 0:
         dataBaseRequest(f"INSERT INTO `users`(`username`, `chatID`) VALUES ('{message.from_user.username}','{message.chat.id}')")
         
-        inline_keyboard = telebot.types.InlineKeyboardMarkup()
-        button1 = telebot.types.InlineKeyboardButton('Я заказчик', callback_data='order')
-        button2 = telebot.types.InlineKeyboardButton('Я исполнитель', callback_data='executor')
-        inline_keyboard.add(button1, button2)
-        bot.send_message(message.chat.id, response['StartMessage'], reply_markup=inline_keyboard)
+       
+        bot.send_message(message.chat.id, response['StartMessage'], reply_markup=startButtons(0,0))
     else:
-        bot.send_message(message.chat.id, response['StartMessage'])
+        bot.send_message(message.chat.id, response['StartMessageAuth'], reply_markup=startButtons(1,0))
 
+
+
+# Тут пока костыльно - для тестов
 
 @bot.callback_query_handler(func=lambda call: True)
 def query_handler(call):
     text = 'Вы выбрали: '
     if call.data == 'order':
         status = 'order'
+        dataBaseRequest(f"UPDATE `users` SET `status` = '{status}' WHERE `chatID` = '{call.message.chat.id}'")
     elif call.data == 'executor':
         status = 'executor'
+        dataBaseRequest(f"UPDATE `users` SET `status` = '{status}' WHERE `chatID` = '{call.message.chat.id}'")
+    elif call.data == 'profile':
+        bot.send_message(call.message.chat.id, 'Тут профиль', reply_markuзp=backButtons())
 
-    dataBaseRequest(f"UPDATE `users` SET `status` = '{status}' WHERE `chatID` = '{call.message.chat.id}'")
+    
     print(call.message.chat.id)
     bot.answer_callback_query(callback_query_id=call.id, text=text, show_alert=False)
 
