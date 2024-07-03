@@ -5,6 +5,6 @@ bot = telebot.TeleBot(TOKEN)
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    bot.reply_to(message, "YA SHALAVA")
+    bot.reply_to(message, "Hello")
 
 bot.polling()
