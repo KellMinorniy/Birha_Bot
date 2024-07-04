@@ -32,6 +32,16 @@ def send_welcome(message):
 
 
 # Тут пока костыльно - для тестов
+# Инфа о юзере
+def format_user_info(user_id, message):
+    user_info = {
+        'name':  message.from_user.first_name,
+        'completed_orders': 0,   
+        'reputation': 0,
+        'id': user_id
+    }
+    return f"Имя: {user_info['name']}\nВыполненные заказы: {user_info['completed_orders']}\nРепутация: {user_info['reputation']}\nId: {user_info['id']}"
+#-----------
 
 @bot.callback_query_handler(func=lambda call: True)
 def query_handler(call):
@@ -43,8 +53,8 @@ def query_handler(call):
         status = 'executor'
         dataBaseRequest(f"UPDATE `users` SET `status` = '{status}' WHERE `chatID` = '{call.message.chat.id}'")
     elif call.data == 'profile':
-        bot.send_message(call.message.chat.id, 'Тут профиль', reply_markuзp=backButtons())
-
+        user_info = format_user_info(call.message.chat.id, call.message)
+        bot.send_message(call.message.chat.id, user_info, reply_markup=backButtons())
     
     print(call.message.chat.id)
     bot.answer_callback_query(callback_query_id=call.id, text=text, show_alert=False)

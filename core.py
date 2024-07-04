@@ -36,7 +36,7 @@ def Verif(usr , url):
         else:
             return False
     except:
-        print('Ошибка! Нету телеграмма')
+        print('Ошибка! Нет телеграмма')
 
     
 
